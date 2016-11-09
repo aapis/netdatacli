@@ -21,6 +21,7 @@ If you're using OSX > 10.4:
 3. `launchtl load -w /Library/LaunchDaemons/com.netdata.monitor.plist`
 
 If using *nix:
+
 1. Configure a cron job.
 2. Profit.
 
