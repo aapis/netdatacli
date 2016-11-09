@@ -9,17 +9,22 @@ module Netdata
         # Params:
         # +url+:: The URL you want to hit
         # +key+:: The authentication key to pass via headers to the URL
-        def get(endpoint, url, version = "v1")
-          req_url = "#{url}/api/#{version}/#{endpoint}"
-          _request(req_url, :GET)
+        def get(endpoint, url, args, version = "v1")
+          qs = build_qs(args)
+          req_url = "#{url}/api/#{version}/#{endpoint}?#{qs}"
+
+          request(req_url, :GET)
         end
 
         # Perform a POST request to a specified URL
         # Params:
         # +url+:: The URL you want to hit
         # +key+:: The authentication key to pass via headers to the URL
-        def post(url)
-          _request(url, :POST)
+        def post(endpoint, url, args, version = "v1")
+          qs = build_qs(args)
+          req_url = "#{url}/api/#{version}/#{endpoint}?#{qs}"
+
+          request(req_url, :POST)
         end
 
         private
@@ -29,7 +34,7 @@ module Netdata
         # +url+:: The URL you want to hit
         # +type+:: The HTTP method to send
         # +key+:: The authentication key to pass via headers to the URL
-        def _request(url, type)
+        def request(url, type)
           url = URI(URI.encode(url))
           type ||= :GET
           req_path = "#{url.path}?#{url.query}"
@@ -45,6 +50,13 @@ module Netdata
           end
 
           res
+        end
+
+        # Create a query string from a hash
+        # Params:
+        # +args+:: The hash
+        def build_qs(args)
+          args.map{|k, v| "#{k}=#{v}"}.join("&")
         end
       end
     end
