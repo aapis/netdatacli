@@ -14,10 +14,18 @@ Installation:
 
 ## Usage
 
+First, create `~/.netdatacli.yml`.  Populate it as follows.
+
+```yml
+instances:
+    http://my.instance.tld:19999
+    http://my.otherinstance.tld:19999
+```
+
 If you're using OSX > 10.4:
 
 1. Rename `com.netdata.monitor.plist.dist` to `com.netdata.monitor.plist` and update the ProgramArguments value to point to where the gem lives (i.e. `/Library/Ruby/Gems/2.0.0`).
-2. `cp com.netdata.monitor.plist /Library/LaunchDaemons`.
+2. `cp com.netdata.monitor.plist /Library/LaunchDaemons`
 3. `launchtl load -w /Library/LaunchDaemons/com.netdata.monitor.plist`
 
 If using *nix:
