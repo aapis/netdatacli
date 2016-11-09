@@ -12,13 +12,21 @@ module Netdata
         return unless @config
 
         @config["instances"].each do |url|
-          alarms = @network.get("alarms", url)
+          alarms = @network.get("alarms", url, {})
 
           return unless alarms
 
           alarms_resp = JSON.parse(alarms.body)
+          cpu_opts = {
+            "chart" => "system.cpu",
+            "format" => "array",
+            "points" => 54,
+            "group" => "average",
+            "options" => "absolute|jsonwrap|nonzero",
+            "after" => -540
+          }
 
-          cpu = @network.get("data?chart=system.cpu&format=array&points=540&group=average&options=absolute|jsonwrap|nonzero&after=-540", url)
+          cpu = @network.get("data", url, cpu_opts)
           cpu_value = JSON.parse(cpu.body)["result"].first
 
           aggregator[alarms_resp["hostname"]] = {}

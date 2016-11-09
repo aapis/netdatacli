@@ -52,10 +52,11 @@ module Netdata
           res
         end
 
-        # Create a query string
+        # Create a query string from a hash
+        # Params:
+        # +args+:: The hash
         def build_qs(args)
-          puts args.inspect
-          exit
+          args.map{|k, v| "#{k}=#{v}"}.join("&")
         end
       end
     end
