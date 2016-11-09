@@ -1,28 +1,28 @@
 # Netdata::Client
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/netdata/client`. To experiment with that code, run `bin/console` for an interactive prompt.
+`netdatacli` is a command line client intended to be run as a cron/launchd job.  It will check your servers every 2 minutes and give you a desktop notification if certain conditions exist.
 
-TODO: Delete this and the text above, and describe your gem
+This is very early stage software, it's just a proof of concept for now.  Features I'm hoping to add include:
 
-## Installation
+* Data aggregation between each report point (every 2 minutes).  So you don't just get a notification about what is happening right now, but also what happened since the last check in (if anything).
+* More datapoints.  Currently it only supports system.cpu.
+* Better architecture.
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'netdata-client'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
+Installation:
 
     $ gem install netdata-client
 
 ## Usage
 
-TODO: Write usage instructions here
+If you're using OSX > 10.4:
+
+1. Rename `com.netdata.monitor.plist.dist` to `com.netdata.monitor.plist` and update the ProgramArguments value to point to where the gem lives (i.e. `/Library/Ruby/Gems/2.0.0`).
+2. `cp com.netdata.monitor.plist /Library/LaunchDaemons`.
+3. `launchtl load -w /Library/LaunchDaemons/com.netdata.monitor.plist`
+
+If using *nix:
+1. Configure a cron job.
+2. Profit.
 
 ## Development
 
