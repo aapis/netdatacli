@@ -2,7 +2,7 @@
 
 `netdatacli` is a command line client intended to be run as a cron/launchd job.  It will check your servers every 2 minutes and give you a desktop notification if certain conditions exist.
 
-This is a prototype only.  It will be rebuilt as an OSX/iOS app at some point in the future.  Features I'm hoping to add at this stage include:
+This is a prototype.  It will be rebuilt as an OSX/iOS app at some point in the future.  Features I'm hoping to add at this stage include:
 
 * Data aggregation between each report point (every 2 minutes).  So you don't just get a notification about what is happening right now, but also what happened since the last check in (if anything).
 * More datapoints.  Currently it only supports system.cpu.
