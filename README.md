@@ -24,7 +24,7 @@ instances:
 
 If you're using OSX > 10.4:
 
-1. Rename `com.netdata.monitor.plist.dist` to `com.netdata.monitor.plist` and update the ProgramArguments value to point to where the gem lives (i.e. `/Library/Ruby/Gems/2.0.0`).
+1. Rename `com.netdata.monitor.2mins.plist.dist` to `com.netdata.monitor.2mins.plist` and update the ProgramArguments value to point to where the gem lives (i.e. `/Library/Ruby/Gems/2.0.0`).
 2. `cp com.netdata.monitor.plist /Library/LaunchDaemons`
 3. `launchtl load -w /Library/LaunchDaemons/com.netdata.monitor.plist`
 

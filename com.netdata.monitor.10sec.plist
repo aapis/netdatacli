@@ -11,6 +11,6 @@
         <string>-s</string>
     </array>
     <key>StartInterval</key>
-    <integer>120</integer>
+    <integer>10</integer>
 </dict>
 </plist>
