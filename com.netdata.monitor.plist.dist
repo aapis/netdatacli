@@ -7,7 +7,7 @@
     <string>com.netdata.monitor</string>
     <key>ProgramArguments</key>
     <array>
-        <string>/path/to/the/gem/netdatacli</string>
+        <string>/Library/Ruby/Gems/2.0.0/gems/netdatacli</string>
     </array>
     <key>StartInterval</key>
     <integer>120</integer>
