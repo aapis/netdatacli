@@ -47,14 +47,15 @@ module Netdata
           aggregator[alarms_resp["hostname"]] = {}
           aggregator[alarms_resp["hostname"]]["cpu"] = cpu_value
           aggregator[alarms_resp["hostname"]]["users_cpu"] = { "users" => users_cpu_users, "value" => users_cpu_value }
+          aggregator[alarms_resp["hostname"]]["alarms"] = alarms
         end
 
         pp aggregator
         message = ""
 
         aggregator.each_pair do |host, data|
-          message += "CPU Warning - #{data["cpu"].round(2)}%\n" if data["cpu"] > 10
-          message += "#{data['users_cpu']['users'].size} system users active\n" if data["users_cpu"]["value"] > 10
+          message += "CPU Warning - #{data["cpu"].round(2)}%\n" if data["cpu"] > 50
+          message += "#{data['users_cpu']['users'].size} system users active (#{data["users_cpu"]["value"].round(2)}% CPU)\n" if data["users_cpu"]["value"] > 50
 
           Notify.bubble(message, "Netdata Warning on #{host}") if message.size > 0
         end
