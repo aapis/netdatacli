@@ -6,7 +6,7 @@ module Netdata
         @config = ::YAML::load_file(File.expand_path("~/.netdatacli.yml"))
       end
 
-      def check
+      def report_interval_2_mins
         aggregator = {}
 
         return unless @config
@@ -63,6 +63,10 @@ module Netdata
             Notify.bubble(message, "Netdata Warning on #{host}") if message.size > 0
           }.join
         end
+      end
+
+      def report_interval_10_sec
+        puts "yep"
       end
     end
   end

@@ -3,6 +3,24 @@ lib = File.expand_path('../../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 require "netdata/client"
+require "optparse"
+
+main = false
+secondary = false
+
+OptionParser.new do |opt|
+  # opt.banner = "netdatacli [...flags]"
+
+  opt.on("-m", "--2min", "Trigger the 2 minute actions") { |o| main = true }
+  opt.on("-s", "--10sec", "Trigger the 10 second actions") { |o| secondary = true }
+end.parse!
 
 client = Netdata::Client::Controller.new
-client.check
+
+if main
+  client.report_interval_2_mins
+end
+
+if secondary
+  client.report_interval_10_sec
+end
