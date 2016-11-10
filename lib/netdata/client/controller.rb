@@ -61,7 +61,7 @@ module Netdata
             message += "CPU Warning - #{data[:cpu].round(2)}%\n" if data[:cpu] > threshold
             message += "#{data[:users_cpu][:users].size} system users active (data[:users_cpu][:value].round(2)}% CPU)\n" if data[:users_cpu][:value] > threshold
             message += "Alarms are ringing" if data[:alarms]
-            message += "#{data[:users_cpu][:history].size} CPU instances > #{threshold}%" if data[:users_cpu][:history].size > 0
+            message += "#{data[:users_cpu][:history].size} CPU instance(s) > #{threshold}%" if data[:users_cpu][:history].size > 0
 
             Notify.bubble(message, "Netdata Warning on #{host}") if message.size > 0
           }.join
