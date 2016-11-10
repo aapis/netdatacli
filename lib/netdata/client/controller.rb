@@ -47,17 +47,21 @@ module Netdata
           aggregator[alarms_resp["hostname"]] = {}
           aggregator[alarms_resp["hostname"]]["cpu"] = cpu_value
           aggregator[alarms_resp["hostname"]]["users_cpu"] = { "users" => users_cpu_users, "value" => users_cpu_value }
-          aggregator[alarms_resp["hostname"]]["alarms"] = alarms
+          aggregator[alarms_resp["hostname"]]["alarms"] = alarms_resp unless alarms_resp["alarms"].empty?
         end
 
         pp aggregator
-        message = ""
 
         aggregator.each_pair do |host, data|
-          message += "CPU Warning - #{data["cpu"].round(2)}%\n" if data["cpu"] > 50
-          message += "#{data['users_cpu']['users'].size} system users active (#{data["users_cpu"]["value"].round(2)}% CPU)\n" if data["users_cpu"]["value"] > 50
+          # new thread for each host so we can see mulitple notifications
+          Thread.new {
+            message = ""
+            message += "CPU Warning - #{data["cpu"].round(2)}%\n" if data["cpu"] > 50
+            message += "#{data['users_cpu']['users'].size} system users active (#{data["users_cpu"]["value"].round(2)}% CPU)\n" if data["users_cpu"]["value"] > 50
+            message += "Alarms are ringing" if data["alarms"]
 
-          Notify.bubble(message, "Netdata Warning on #{host}") if message.size > 0
+            Notify.bubble(message, "Netdata Warning on #{host}") if message.size > 0
+          }.join
         end
       end
     end
