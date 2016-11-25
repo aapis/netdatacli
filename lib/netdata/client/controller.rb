@@ -48,7 +48,7 @@ module Netdata
 
           aggregator[alarms_resp["hostname"]] = {}
           aggregator[alarms_resp["hostname"]][:cpu] = cpu_value
-          aggregator[alarms_resp["hostname"]][:users_cpu] = { users: users_cpu_users, value: users_cpu_value, history: users_cpu_value_history.select {|val| val > threshold } }
+          aggregator[alarms_resp["hostname"]][:users_cpu] = { users: users_cpu_users, value: users_cpu_value, history: users_cpu_value_history.select { |val| val > threshold } }
           aggregator[alarms_resp["hostname"]][:alarms] = alarms_resp unless alarms_resp["alarms"].empty?
         end
 
