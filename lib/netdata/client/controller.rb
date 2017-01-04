@@ -17,10 +17,55 @@ module Netdata
 
           return unless alarms
 
-          alarms_resp = JSON.parse(alarms.body)
+          alarms_resp = parse_alarms(JSON.parse(alarms.body))
 
           # system CPU stats
-          cpu_opts = {
+          cpu_value = get_cpu(url)
+
+          # CPU on a per-user basis
+          users_cpu_value_history, users_cpu_value, users_cpu_users = get_cpu_users(url)
+
+          aggregator[alarms_resp["hostname"]] = {}
+          aggregator[alarms_resp["hostname"]][:cpu] = cpu_value
+          aggregator[alarms_resp["hostname"]][:users_cpu] = { users: users_cpu_users, value: users_cpu_value, history: users_cpu_value_history.select { |val| val > threshold } }
+          aggregator[alarms_resp["hostname"]][:alarms] = alarms_resp unless alarms_resp["alarms"].nil?
+        end
+
+        pp aggregator
+
+        aggregator.each_pair do |host, data|
+          # new thread for each host so we can see mulitple notifications
+          Thread.new {
+            message = ""
+            message += "CPU Warning - #{data[:cpu].round(2)}%\n" if data[:cpu] > threshold
+            message += "#{data[:users_cpu][:users].size} system users active (#{data[:users_cpu][:value].round(2)}% CPU)\n" if data[:users_cpu][:value] > threshold
+            message += "Alarms are ringing\n" if data[:alarms]
+            message += "#{data[:users_cpu][:history].size} CPU instance(s) > #{threshold}%\n" if data[:users_cpu][:history].size > 0
+
+            Notify.bubble(message, "Netdata Warning on #{host}") if message.size > 0
+          }.join
+        end
+      end
+
+      private
+
+      def parse_alarms(data)
+        out = data.dup
+        out["alarms"] = nil
+
+        return {} if data["alarms"].empty?
+
+        data['alarms'].each do |alarm|
+          alarm_name = alarm[0]
+          alarm_value = alarm[1]
+          out["alarms"] = alarm_value unless alarm_value["recipient"] == 'silent'
+        end
+
+        out
+      end
+
+      def get_cpu(url)
+        cpu_opts = {
             "chart" => "system.cpu",
             "format" => "array",
             "points" => 54,
@@ -30,9 +75,10 @@ module Netdata
           }
           cpu = @network.get("data", url, cpu_opts)
           cpu_value = JSON.parse(cpu.body)["result"].first
+      end
 
-          # CPU on a per-user basis
-          users_cpu_opts = {
+      def get_cpu_users(url)
+        users_cpu_opts = {
             "chart" => "users.cpu",
             "format" => "array",
             "points" => 54,
@@ -46,26 +92,7 @@ module Netdata
           users_cpu_value_history = users_cpu_resp["result"][0..119]
           users_cpu_users = users_cpu_resp["dimension_names"]
 
-          aggregator[alarms_resp["hostname"]] = {}
-          aggregator[alarms_resp["hostname"]][:cpu] = cpu_value
-          aggregator[alarms_resp["hostname"]][:users_cpu] = { users: users_cpu_users, value: users_cpu_value, history: users_cpu_value_history.select { |val| val > threshold } }
-          aggregator[alarms_resp["hostname"]][:alarms] = alarms_resp unless alarms_resp["alarms"].empty?
-        end
-
-        pp aggregator
-
-        aggregator.each_pair do |host, data|
-          # new thread for each host so we can see mulitple notifications
-          Thread.new {
-            message = ""
-            message += "CPU Warning - #{data[:cpu].round(2)}%\n" if data[:cpu] > threshold
-            message += "#{data[:users_cpu][:users].size} system users active (#{data[:users_cpu][:value].round(2)}% CPU)\n" if data[:users_cpu][:value] > threshold
-            message += "Alarms are ringing" if data[:alarms]
-            message += "#{data[:users_cpu][:history].size} CPU instance(s) > #{threshold}%" if data[:users_cpu][:history].size > 0
-
-            Notify.bubble(message, "Netdata Warning on #{host}") if message.size > 0
-          }.join
-        end
+          [users_cpu_value_history, users_cpu_value, users_cpu_users]
       end
     end
   end
