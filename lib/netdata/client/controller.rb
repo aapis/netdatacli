@@ -20,14 +20,11 @@ module Netdata
 
           alarms_resp = @aggregator.parse_alarms(JSON.parse(alarms.body))
 
-          # system CPU stats
-          cpu_value = @aggregator.get_cpu(url)
-
           # CPU on a per-user basis
           users_cpu_value_history, users_cpu_value, users_cpu_users = @aggregator.get_cpu_users(url)
 
           aggregator[alarms_resp['hostname']] = {}
-          aggregator[alarms_resp['hostname']][:cpu] = cpu_value
+          aggregator[alarms_resp['hostname']][:cpu] = @aggregator.get_cpu(url)
           aggregator[alarms_resp['hostname']][:users_cpu] = { users: users_cpu_users, value: users_cpu_value, history: users_cpu_value_history.select { |val| val > threshold } }
           aggregator[alarms_resp['hostname']][:alarms] = alarms_resp unless alarms_resp['alarms'].nil?
         end

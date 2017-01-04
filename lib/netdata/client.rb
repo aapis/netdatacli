@@ -10,6 +10,7 @@ require 'netdata/client/helper/data_aggregator'
 require 'netdata/client/version'
 
 module Netdata
+  # Client module
   module Client
     # something...
   end
