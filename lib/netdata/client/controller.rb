@@ -3,6 +3,7 @@ module Netdata
     class Controller
       def initialize
         @network = Helper::Network.new
+        @aggregator = Helper::DataAggregator.new
         @config = ::YAML::load_file(File.expand_path("~/.netdatacli.yml"))
       end
 
@@ -17,13 +18,13 @@ module Netdata
 
           return unless alarms
 
-          alarms_resp = parse_alarms(JSON.parse(alarms.body))
+          alarms_resp = @aggregator.parse_alarms(JSON.parse(alarms.body))
 
           # system CPU stats
-          cpu_value = get_cpu(url)
+          cpu_value = @aggregator.get_cpu(url)
 
           # CPU on a per-user basis
-          users_cpu_value_history, users_cpu_value, users_cpu_users = get_cpu_users(url)
+          users_cpu_value_history, users_cpu_value, users_cpu_users = @aggregator.get_cpu_users(url)
 
           aggregator[alarms_resp["hostname"]] = {}
           aggregator[alarms_resp["hostname"]][:cpu] = cpu_value
@@ -45,54 +46,6 @@ module Netdata
             Notify.bubble(message, "Netdata Warning on #{host}") if message.size > 0
           }.join
         end
-      end
-
-      private
-
-      def parse_alarms(data)
-        out = data.dup
-        out["alarms"] = nil
-
-        return {} if data["alarms"].empty?
-
-        data['alarms'].each do |alarm|
-          alarm_name = alarm[0]
-          alarm_value = alarm[1]
-          out["alarms"] = alarm_value unless alarm_value["recipient"] == 'silent'
-        end
-
-        out
-      end
-
-      def get_cpu(url)
-        cpu_opts = {
-            "chart" => "system.cpu",
-            "format" => "array",
-            "points" => 54,
-            "group" => "average",
-            "options" => "absolute|jsonwrap|nonzero",
-            "after" => -540
-          }
-          cpu = @network.get("data", url, cpu_opts)
-          cpu_value = JSON.parse(cpu.body)["result"].first
-      end
-
-      def get_cpu_users(url)
-        users_cpu_opts = {
-            "chart" => "users.cpu",
-            "format" => "array",
-            "points" => 54,
-            "group" => "average",
-            "options" => "absolute|jsonwrap|nonzero",
-            "after" => -540
-          }
-          users_cpu = @network.get("data", url, users_cpu_opts)
-          users_cpu_resp = JSON.parse(users_cpu.body)
-          users_cpu_value = users_cpu_resp["result"].first
-          users_cpu_value_history = users_cpu_resp["result"][0..119]
-          users_cpu_users = users_cpu_resp["dimension_names"]
-
-          [users_cpu_value_history, users_cpu_value, users_cpu_users]
       end
     end
   end
