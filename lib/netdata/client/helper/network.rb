@@ -1,6 +1,7 @@
 module Netdata
   module Client
     module Helper
+      # Perform HTTP requests
       class Network
         # Access the configuration object instance externally
         attr_accessor :config
@@ -9,7 +10,7 @@ module Netdata
         # Params:
         # +url+:: The URL you want to hit
         # +key+:: The authentication key to pass via headers to the URL
-        def get(endpoint, url, args, version = "v1")
+        def get(endpoint, url, args, version = 'v1')
           qs = build_qs(args)
           req_url = "#{url}/api/#{version}/#{endpoint}?#{qs}"
 
@@ -20,7 +21,7 @@ module Netdata
         # Params:
         # +url+:: The URL you want to hit
         # +key+:: The authentication key to pass via headers to the URL
-        def post(endpoint, url, args, version = "v1")
+        def post(endpoint, url, args, version = 'v1')
           qs = build_qs(args)
           req_url = "#{url}/api/#{version}/#{endpoint}?#{qs}"
 
@@ -56,7 +57,7 @@ module Netdata
         # Params:
         # +args+:: The hash
         def build_qs(args)
-          args.map{|k, v| "#{k}=#{v}"}.join("&")
+          args.map { |k, v| "#{k}=#{v}" }.join('&')
         end
       end
     end
