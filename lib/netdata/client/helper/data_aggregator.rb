@@ -2,6 +2,10 @@ module Netdata
   module Client
     module Helper
       class DataAggregator
+        def initialize
+          @network = Network.new
+        end
+
         def parse_alarms(data)
           out = data.dup
           out["alarms"] = nil
