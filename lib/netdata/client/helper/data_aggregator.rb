@@ -33,7 +33,7 @@ module Netdata
         def parse_alarms(data)
           out = data.dup
 
-          return {} if data['alarms'].empty?
+          return { 'hostname' => data['hostname'] } if data['alarms'].empty?
 
           out['alarms'] = nil
 
