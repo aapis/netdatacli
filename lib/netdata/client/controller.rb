@@ -9,7 +9,7 @@ module Netdata
 
       def report_interval_2_mins
         aggregator = {}
-        threshold = 50 # numbers higher than this should trigger notifications
+        threshold = 70 # numbers higher than this should trigger notifications
 
         return unless @config
 
@@ -38,7 +38,7 @@ module Netdata
             message += "CPU Warning - #{data[:cpu].round(2)}%\n" if data[:cpu] > threshold
             message += "#{data[:users_cpu][:users].size} system users active (#{data[:users_cpu][:value].round(2)}% CPU)\n" if data[:users_cpu][:value] > threshold
             message += "Alarms are ringing\n" if data[:alarms]
-            message += "#{data[:users_cpu][:history].size} CPU instance(s) > #{threshold}%\n" if data[:users_cpu][:history].size > 0
+            message += "#{data[:users_cpu][:history].size} CPU instance(s) > #{threshold}%\n" if data[:users_cpu][:history].size > 4
 
             Notify.bubble(message, "Netdata Warning on #{host}") if message.size > 0
           }.join
